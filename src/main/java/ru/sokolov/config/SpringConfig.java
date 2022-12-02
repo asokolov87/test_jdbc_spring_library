@@ -19,13 +19,19 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import javax.sql.DataSource;
 import java.util.Objects;
 
+   /* Класс конфигурации приложения MVC
+      Реализация методов WebMvcConfigurer позваляет изменить конфигурацию*/
+
 @Configuration
 @ComponentScan("ru.sokolov")
-@EnableWebMvc
+@EnableWebMvc                // mvc:annotation-driven
 @PropertySource("classpath:database.properties")
 public class SpringConfig implements WebMvcConfigurer {
 
+    //контекст приложения будет внедрен Spring
     private final ApplicationContext applicationContext;
+
+    //подключение файла со значениями переменных
     private final Environment environment;
 
     @Autowired
@@ -34,6 +40,7 @@ public class SpringConfig implements WebMvcConfigurer {
         this.environment = environment;
     }
 
+    //настройка шаблонизатора
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
@@ -41,17 +48,24 @@ public class SpringConfig implements WebMvcConfigurer {
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
+        //Кэш шаблонов по умолчанию имеет значение true.
+        //Установите значение false - шаблоны будут автоматически обновляться при изменении.
+        templateResolver.setCacheable(true);
         return templateResolver;
     }
 
+    //настройка шаблонизатора
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
+        //Включение компилятора SpringEL с Spring 4.2.4 или новее может
+        //ускорить выполнение в большинстве сценариев
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
     }
 
+    //подключение шаблонизатора Thymeleaf
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
@@ -60,6 +74,7 @@ public class SpringConfig implements WebMvcConfigurer {
         registry.viewResolver(resolver);
     }
 
+    //регистрация источника данных (базы данных)
     @Bean
     public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

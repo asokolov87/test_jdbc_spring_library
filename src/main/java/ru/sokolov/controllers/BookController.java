@@ -68,6 +68,10 @@ public class BookController {
     }
 
     @PatchMapping("/{id}")
+    //@ModelAttribute - создает объект класса из полученых полей с формы
+    //@PathVariable - получение значения из адресной строки
+    //@Valid - проверка объекта на валидность
+    //BindingResult bindingResult - хранит ошибки валидации
     public String update(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult,
                          @PathVariable("id") int id) {
         if (bindingResult.hasErrors())
@@ -93,5 +97,11 @@ public class BookController {
     public String release(@PathVariable("id") int id){
         bookDAO.release(id);
         return "redirect:/book/"+id;
+    }
+
+    //внедряет во все методы контроллера пару ключь - значние
+    @ModelAttribute("message")
+    public String message(){
+        return "Hello user";
     }
 }
